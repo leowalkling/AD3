@@ -21,6 +21,8 @@
 #include "FactorGraph.h"
 #include "Utils.h"
 
+using namespace std;
+
 namespace AD3 {
 
 // Check if there is any multi-variable which does not 

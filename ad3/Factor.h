@@ -24,9 +24,9 @@
 #include <iomanip>
 #include <assert.h>
 
-using namespace std;
-
 namespace AD3 {
+
+class Factor;
 
 struct FactorTypes {
   enum {
@@ -80,8 +80,8 @@ class BinaryVariable {
  private:
   int id_; // Variable Id.
   double log_potential_; // Log-potential of the variable.
-  vector<Factor*> factors_; // Factors linked to the variable.
-  vector<int> links_; // Link identifiers.
+  std::vector<Factor*> factors_; // Factors linked to the variable.
+  std::vector<int> links_; // Link identifiers.
 };
 
 // Base class for a factor.
@@ -106,7 +106,7 @@ class Factor {
   bool IsVariableNegated(int i) { return negated_[i]; }
 
   // Print as a string.
-  virtual void Print(ostream& stream) {
+  virtual void Print(std::ostream& stream) {
     stream << " " << binary_variables_.size();
     for (int i = 0; i < binary_variables_.size(); ++i) {
       stream << " " << (negated_[i]? "-" : "")
@@ -115,8 +115,8 @@ class Factor {
   }
 
   // Initialize factor.
-  virtual void Initialize(const vector<BinaryVariable*> &binary_variables,
-                          const vector<bool> &negated,
+  virtual void Initialize(const std::vector<BinaryVariable*> &binary_variables,
+                          const std::vector<bool> &negated,
                           int *link_id) {
     binary_variables_ = binary_variables;
     if (negated.size() == 0) {
@@ -151,9 +151,9 @@ class Factor {
   // Returns 2 if factor became inactive.
   // Returns -1 if a contradiction was found, in which case the
   // problem is infeasible.
-  virtual int AddEvidence(vector<bool> *active_links,
-                          vector<int> *evidence,
-                          vector<int> *additional_evidence) {
+  virtual int AddEvidence(std::vector<bool> *active_links,
+	                      std::vector<int> *evidence,
+	                      std::vector<int> *additional_evidence) {
     // TODO: Implement this function for all the factors and make this pure
     // virtual. Right now we just have this implemented for the logic factors.
     assert(false);
@@ -161,17 +161,17 @@ class Factor {
   }
 
   // Gets/Sets additional log potentials.
-  const vector<double> &GetAdditionalLogPotentials() {
+  const std::vector<double> &GetAdditionalLogPotentials() {
     return additional_log_potentials_;
   }
 
   void SetAdditionalLogPotentials(
-      const vector<double> &additional_log_potentials) {
+      const std::vector<double> &additional_log_potentials) {
     additional_log_potentials_ = additional_log_potentials;
   }
 
   // Gets/Sets/Computes cached values.
-  vector<double> *GetMutableCachedVariableLogPotentials() {
+  std::vector<double> *GetMutableCachedVariableLogPotentials() {
     return &variable_log_potentials_last_;
   }
   void ComputeCachedAdditionalLogPotentials(double denominator) {
@@ -181,25 +181,25 @@ class Factor {
           additional_log_potentials_[i] / denominator;
     }
   }
-  const vector<double> &GetCachedVariablePosteriors() {
+  const std::vector<double> &GetCachedVariablePosteriors() {
     return variable_posteriors_last_;
   }
-  const vector<double> &GetCachedAdditionalPosteriors() {
+  const std::vector<double> &GetCachedAdditionalPosteriors() {
     return additional_posteriors_last_;
   }
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  virtual void SolveMAP(const vector<double> &variable_log_potentials,
-                        const vector<double> &additional_log_potentials,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors,
+  virtual void SolveMAP(const std::vector<double> &variable_log_potentials,
+                        const std::vector<double> &additional_log_potentials,
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors,
                         double *value) = 0;
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  virtual void SolveQP(const vector<double> &variable_log_potentials,
-                       const vector<double> &additional_log_potentials,
-                       vector<double> *variable_posteriors,
-                       vector<double> *additional_posteriors) = 0;
+  virtual void SolveQP(const std::vector<double> &variable_log_potentials,
+                       const std::vector<double> &additional_log_potentials,
+                       std::vector<double> *variable_posteriors,
+                       std::vector<double> *additional_posteriors) = 0;
 
   // Cached version of SolveMAP.
   virtual void SolveMAPCached(double *value) {
@@ -223,16 +223,16 @@ class Factor {
 
  protected:
   // Properties of the factor.
-  vector<BinaryVariable*> binary_variables_;
-  vector<bool> negated_;
-  vector<int> links_;
-  vector<double> additional_log_potentials_;
+  std::vector<BinaryVariable*> binary_variables_;
+  std::vector<bool> negated_;
+  std::vector<int> links_;
+  std::vector<double> additional_log_potentials_;
 
   // Cached potentials/posteriors.
-  vector<double> variable_log_potentials_last_;
-  vector<double> additional_log_potentials_last_;
-  vector<double> variable_posteriors_last_;
-  vector<double> additional_posteriors_last_;
+  std::vector<double> variable_log_potentials_last_;
+  std::vector<double> additional_log_potentials_last_;
+  std::vector<double> variable_posteriors_last_;
+  std::vector<double> additional_posteriors_last_;
 
 };
 
@@ -242,33 +242,33 @@ class FactorXOR : public Factor {
   int type() { return FactorTypes::FACTOR_XOR; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "XOR";
     Factor::Print(stream);
-    stream << endl;
+    stream << std::endl;
   }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence);
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence);
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Cached copy of the last sort.
-  vector<pair<double,int> > last_sort_;
+  std::vector<std::pair<double,int> > last_sort_;
 };
 
 // AtMostOne factor. Only configurations with at most one 1 are legal.
@@ -277,33 +277,33 @@ class FactorAtMostOne : public Factor {
   int type() { return FactorTypes::FACTOR_ATMOSTONE; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "ATMOSTONE";
     Factor::Print(stream);
-    stream << endl;
+    stream << std::endl;
   }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence);
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence);
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Cached copy of the last sort.
-  vector<pair<double,int> > last_sort_;
+  std::vector<std::pair<double,int> > last_sort_;
 };
 
 // OR factor. Only configurations with at least one 1 are legal.
@@ -312,16 +312,16 @@ class FactorOR : public Factor {
   int type() { return FactorTypes::FACTOR_OR; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "OR";
     Factor::Print(stream);
-    stream << endl;
+    stream << std::endl;
   }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence);
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence);
 
   // Initialize from a OROUT factor in which the last variable is dropped (set 
   // to 1), turning the factor into a OR.
@@ -339,21 +339,21 @@ class FactorOR : public Factor {
   }
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Cached copy of the last sort.
-  vector<pair<double,int> > last_sort_;
+  std::vector<std::pair<double,int> > last_sort_;
 };
 
 // OR-with-output factor. The last variable is the output 
@@ -363,33 +363,33 @@ public:
   int type() { return FactorTypes::FACTOR_OROUT; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "OROUT";
     Factor::Print(stream);
-    stream << endl;
+    stream << std::endl;
   }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence);
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence);
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Cached copy of the last sort.
-  vector<pair<double,int> > last_sort_;
+  std::vector<std::pair<double,int> > last_sort_;
 };
 
 // BUDGET factor. The sum of the variables is constrained to be less than or
@@ -399,10 +399,10 @@ public:
   int type() { return FactorTypes::FACTOR_BUDGET; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "BUDGET";
     Factor::Print(stream);
-    stream << " " << GetBudget() << endl;
+    stream << " " << GetBudget() << std::endl;
   }
 
   // Get/set budget value.
@@ -410,32 +410,32 @@ public:
   void SetBudget(int budget) { budget_ = budget; }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence) {
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence) {
     assert(false);
     return 0;
   }
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Budget value.
   int budget_;
   
   // Cached copy of the last sort.
-  vector<pair<double,int> > last_sort_;
+  std::vector<std::pair<double,int> > last_sort_;
 };
 
 // KNAPSACK factor. The weighted sum of the variables is constrained
@@ -445,13 +445,13 @@ public:
   int type() { return FactorTypes::FACTOR_KNAPSACK; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "KNAPSACK";
     Factor::Print(stream);
     for (int i = 0; i < Degree(); ++i) {
-      stream << " " << GetCost(i) << endl;
+      stream << " " << GetCost(i) << std::endl;
     }
-    stream << " " << GetBudget() << endl;
+    stream << " " << GetBudget() << std::endl;
   }
 
   // Get/set costs.
@@ -464,32 +464,32 @@ public:
   void SetBudget(double budget) { budget_ = budget; }
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence) {
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence) {
     assert(false);
     return 0;
   }
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
  private:
   // Budget value.
   double budget_;
   
   // Costs of each variable.
-  vector<double> costs_;
+  std::vector<double> costs_;
 };
 
 // PAIR factor. It connects a pair of binary variables, 
@@ -500,34 +500,34 @@ class FactorPAIR : public Factor {
   int type() { return FactorTypes::FACTOR_PAIR; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "PAIR";
     Factor::Print(stream);
-    stream << " " << setprecision(9) << GetLogPotential() << endl;
+    stream << " " << std::setprecision(9) << GetLogPotential() << std::endl;
   }
 
   // Get edge log-potential.
   double GetLogPotential() { return additional_log_potentials_[0]; }
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
-  void SolveMAP(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
-                vector<double> *variable_posteriors,
-                vector<double> *additional_posteriors,
+  void SolveMAP(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
+                std::vector<double> *variable_posteriors,
+                std::vector<double> *additional_posteriors,
                 double *value);
 
   // Solve the QP (local subproblem in the AD3 algorithm).
-  void SolveQP(const vector<double> &variable_log_potentials,
-               const vector<double> &additional_log_potentials,
-               vector<double> *variable_posteriors,
-               vector<double> *additional_posteriors);
+  void SolveQP(const std::vector<double> &variable_log_potentials,
+               const std::vector<double> &additional_log_potentials,
+               std::vector<double> *variable_posteriors,
+               std::vector<double> *additional_posteriors);
 
   // Add evidence information to the factor.
-  int AddEvidence(vector<bool> *active_links,
-                  vector<int> *evidence,
-                  vector<int> *additional_evidence);
+  int AddEvidence(std::vector<bool> *active_links,
+                  std::vector<int> *evidence,
+                  std::vector<int> *additional_evidence);
 };
 
 } // namespace AD3
 
-#endif /* FACTOR_H_ */
+#endif

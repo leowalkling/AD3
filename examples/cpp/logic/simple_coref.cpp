@@ -33,6 +33,10 @@
 #include "ad3/Utils.h"
 #include <cstdlib>
 
+using std::cout;
+using std::endl;
+using std::vector;
+
 int main(int argc, char **argv) {
   int num_words = 10;
   double pronoun_probability = 0.8; // Probability of a word being a pronoun.

@@ -16,6 +16,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef FACTOR_GRAPH_H_
+#define FACTOR_GRAPH_H_
+
 #include <iostream>
 #include "Factor.h"
 #include "GenericFactor.h"
@@ -66,7 +69,7 @@ class FactorGraph {
     MultiVariable *multi = new MultiVariable;
     multi->SetId(multi_variables_.size());
     multi_variables_.push_back(multi);
-    vector<BinaryVariable*> states(num_states);
+    std::vector<BinaryVariable*> states(num_states);
     for (int i = 0; i < num_states; ++i) {
       BinaryVariable *state = CreateBinaryVariable();
       states[i] = state;
@@ -77,7 +80,7 @@ class FactorGraph {
 
   // Create a new multi-valued variable with existing states.
   MultiVariable *CreateMultiVariable(
-      const vector<BinaryVariable*> &states) {
+      const std::vector<BinaryVariable*> &states) {
     MultiVariable *multi = new MultiVariable;
     multi->SetId(multi_variables_.size());
     multi_variables_.push_back(multi);
@@ -87,13 +90,13 @@ class FactorGraph {
 
   // Declare a factor.
   // By default, the factor is NOT owned by the factor graph.
-  void DeclareFactor(Factor *factor, const vector<BinaryVariable*> &variables,
+  void DeclareFactor(Factor *factor, const std::vector<BinaryVariable*> &variables,
                      bool owned_by_graph = false) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     DeclareFactor(factor, variables, negated, owned_by_graph);
   }
-  void DeclareFactor(Factor *factor, const vector<BinaryVariable*> &variables,
-                     const vector<bool> &negated,
+  void DeclareFactor(Factor *factor, const std::vector<BinaryVariable*> &variables,
+                     const std::vector<bool> &negated,
                      bool owned_by_graph = false) {
     if (factor->IsGeneric()) {
       static_cast<GenericFactor*>(factor)->SetVerbosity(verbosity_);
@@ -106,13 +109,13 @@ class FactorGraph {
 
   // Create a new XOR factor.
   // By default, the factor will be owned by the factor graph.
-  Factor *CreateFactorXOR(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorXOR(const std::vector<BinaryVariable*> &variables,
                           bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorXOR(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorXOR(const vector<BinaryVariable*> &variables,
-                          const vector<bool> &negated,
+  Factor *CreateFactorXOR(const std::vector<BinaryVariable*> &variables,
+                          const std::vector<bool> &negated,
                           bool owned_by_graph = true) {
     Factor *factor = new FactorXOR;
     DeclareFactor(factor, variables, negated, owned_by_graph);
@@ -122,16 +125,16 @@ class FactorGraph {
 
   // Create a new XOR-with-output factor.
   // This is a XOR whose last variable is negated.
-  Factor *CreateFactorXOROUT(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorXOROUT(const std::vector<BinaryVariable*> &variables,
                              bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorXOROUT(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorXOROUT(const vector<BinaryVariable*> &variables,
-                             const vector<bool> &negated,
+  Factor *CreateFactorXOROUT(const std::vector<BinaryVariable*> &variables,
+                             const std::vector<bool> &negated,
                              bool owned_by_graph = true) {
     Factor *factor = new FactorXOR;
-    vector<bool> negated_copy = negated;
+    std::vector<bool> negated_copy = negated;
     if (negated_copy.size() == 0) {
       negated_copy.resize(variables.size(), false);
     }
@@ -142,13 +145,13 @@ class FactorGraph {
   }
 
   // Create a new AtMostOne factor.
-  Factor *CreateFactorAtMostOne(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorAtMostOne(const std::vector<BinaryVariable*> &variables,
                           bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorAtMostOne(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorAtMostOne(const vector<BinaryVariable*> &variables,
-                                const vector<bool> &negated,
+  Factor *CreateFactorAtMostOne(const std::vector<BinaryVariable*> &variables,
+                                const std::vector<bool> &negated,
                                 bool owned_by_graph = true) {
     Factor *factor = new FactorAtMostOne;
     DeclareFactor(factor, variables, negated, owned_by_graph);
@@ -157,13 +160,13 @@ class FactorGraph {
   }
 
   // Create a new OR factor.
-  Factor *CreateFactorOR(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorOR(const std::vector<BinaryVariable*> &variables,
                           bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorOR(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorOR(const vector<BinaryVariable*> &variables,
-                         const vector<bool> &negated,
+  Factor *CreateFactorOR(const std::vector<BinaryVariable*> &variables,
+                         const std::vector<bool> &negated,
                          bool owned_by_graph = true) {
     Factor *factor = new FactorOR;
     DeclareFactor(factor, variables, negated, owned_by_graph);
@@ -172,13 +175,13 @@ class FactorGraph {
   }
 
   // Create a new OR-with-output factor.
-  Factor *CreateFactorOROUT(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorOROUT(const std::vector<BinaryVariable*> &variables,
                             bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorOROUT(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorOROUT(const vector<BinaryVariable*> &variables,
-                            const vector<bool> &negated,
+  Factor *CreateFactorOROUT(const std::vector<BinaryVariable*> &variables,
+                            const std::vector<bool> &negated,
                             bool owned_by_graph = true) {
     Factor *factor = new FactorOROUT;
     DeclareFactor(factor, variables, negated, owned_by_graph);
@@ -188,16 +191,16 @@ class FactorGraph {
 
   // Create a new AND-with-output factor.
   // This is a OROUT whose all variables negated.
-  Factor *CreateFactorANDOUT(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorANDOUT(const std::vector<BinaryVariable*> &variables,
                              bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorANDOUT(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorANDOUT(const vector<BinaryVariable*> &variables,
-                             const vector<bool> &negated,
+  Factor *CreateFactorANDOUT(const std::vector<BinaryVariable*> &variables,
+                             const std::vector<bool> &negated,
                              bool owned_by_graph = true) {
     Factor *factor = new FactorOROUT;
-    vector<bool> negated_copy = negated;
+    std::vector<bool> negated_copy = negated;
     if (negated_copy.size() == 0) {
       negated_copy.resize(variables.size(), false);
     }
@@ -212,16 +215,16 @@ class FactorGraph {
   // Create a new IMPLY factor.
   // This is a OR whose first K-1 variables are negated.
   // It imposes (A_1 ^ A_2 ^ ... ^ A_{K-1} => A_K).
-  Factor *CreateFactorIMPLY(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorIMPLY(const std::vector<BinaryVariable*> &variables,
                              bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorIMPLY(variables, negated, owned_by_graph);
   }
-  Factor *CreateFactorIMPLY(const vector<BinaryVariable*> &variables,
-                            const vector<bool> &negated,
+  Factor *CreateFactorIMPLY(const std::vector<BinaryVariable*> &variables,
+                            const std::vector<bool> &negated,
                             bool owned_by_graph = true) {
     Factor *factor = new FactorOR;
-    vector<bool> negated_copy = negated;
+    std::vector<bool> negated_copy = negated;
     if (negated_copy.size() == 0) {
       negated_copy.resize(variables.size(), false);
     }
@@ -234,14 +237,14 @@ class FactorGraph {
   }
 
   // Create a new BUDGET factor.
-  Factor *CreateFactorBUDGET(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorBUDGET(const std::vector<BinaryVariable*> &variables,
                              int budget,
                              bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorBUDGET(variables, negated, budget, owned_by_graph);
   }
-  Factor *CreateFactorBUDGET(const vector<BinaryVariable*> &variables,
-                             const vector<bool> &negated,
+  Factor *CreateFactorBUDGET(const std::vector<BinaryVariable*> &variables,
+                             const std::vector<bool> &negated,
                              int budget,
                              bool owned_by_graph = true) {
     Factor *factor = new FactorBUDGET;
@@ -251,17 +254,17 @@ class FactorGraph {
   }
 
   // Create a new KNAPSACK factor.
-  Factor *CreateFactorKNAPSACK(const vector<BinaryVariable*> &variables,
-                               const vector<double> &costs,
+  Factor *CreateFactorKNAPSACK(const std::vector<BinaryVariable*> &variables,
+                               const std::vector<double> &costs,
                                double budget,
                                bool owned_by_graph = true) {
-    vector<bool> negated;
+    std::vector<bool> negated;
     return CreateFactorKNAPSACK(variables, negated, costs, budget,
                                 owned_by_graph);
   }
-  Factor *CreateFactorKNAPSACK(const vector<BinaryVariable*> &variables,
-                               const vector<bool> &negated,
-                               const vector<double> &costs,
+  Factor *CreateFactorKNAPSACK(const std::vector<BinaryVariable*> &variables,
+                               const std::vector<bool> &negated,
+                               const std::vector<double> &costs,
                                double budget,
                                bool owned_by_graph = true) {
     Factor *factor = new FactorKNAPSACK;
@@ -279,13 +282,13 @@ class FactorGraph {
   // configuration where both inputs are 1, which receives the value
   // in edge_log_potential.
   // REMARK: for efficiency, cannot have negated variables.
-  Factor *CreateFactorPAIR(const vector<BinaryVariable*> &variables,
+  Factor *CreateFactorPAIR(const std::vector<BinaryVariable*> &variables,
                            double edge_log_potential,
                            bool owned_by_graph = true) {
     Factor *factor = new FactorPAIR;
-    vector<bool> negated;
+    std::vector<bool> negated;
     DeclareFactor(factor, variables, negated, owned_by_graph);
-    vector<double> additional_log_potentials(1, edge_log_potential);
+    std::vector<double> additional_log_potentials(1, edge_log_potential);
     factor->SetAdditionalLogPotentials(additional_log_potentials);
     return factor;
   }
@@ -293,17 +296,17 @@ class FactorGraph {
   // Create a new dense factor.
   // All additional log-potentials are assumed to be in the following order:
   // scores[0,0,...,0], scores[0,0,...,1], etc.
-  Factor *CreateFactorDense(const vector<MultiVariable*> &multi_variables,
-                            const vector<double> &additional_log_potentials,
+  Factor *CreateFactorDense(const std::vector<MultiVariable*> &multi_variables,
+                            const std::vector<double> &additional_log_potentials,
                             bool owned_by_graph = true) {
     Factor *factor = new FactorDense;
-    vector<BinaryVariable*> variables;
+    std::vector<BinaryVariable*> variables;
     for (int i = 0; i < multi_variables.size(); ++i) {
       variables.insert(variables.end(),
                        multi_variables[i]->GetStates().begin(),
                        multi_variables[i]->GetStates().end());
     }
-    vector<bool> negated;
+    std::vector<bool> negated;
     DeclareFactor(factor, variables, negated, owned_by_graph);
     static_cast<FactorDense*>(factor)->Initialize(multi_variables);
     factor->SetAdditionalLogPotentials(additional_log_potentials);
@@ -319,9 +322,9 @@ class FactorGraph {
   Factor *GetFactor(int i) { return factors_[i]; }
 
   // Get primal/dual variables.
-  const vector<double> &GetDualVariables() { return lambdas_; }
-  const vector<double> &GetLocalPrimalVariables() { return maps_; }
-  const vector<double> &GetGlobalPrimalVariables() { return maps_av_; }
+  const std::vector<double> &GetDualVariables() { return lambdas_; }
+  const std::vector<double> &GetLocalPrimalVariables() { return maps_; }
+  const std::vector<double> &GetGlobalPrimalVariables() { return maps_av_; }
 
   // Check if there is any multi-variable which does not
   // belong to any factor, and if so, assign a XOR factor
@@ -342,15 +345,15 @@ class FactorGraph {
   // factor information) to the new indices in the transformed factor graph.
   // Entries will be set to -1 if that index is no longer part of the factor
   // graph after the transformation.
-  int AddEvidence(vector<int> *evidence,
-                  vector<int> *recomputed_indices);
+  int AddEvidence(std::vector<int> *evidence,
+                  std::vector<int> *recomputed_indices);
 
   // Print factor graph as a string.
-  void Print(ostream& stream) {
-    stream << GetNumVariables() << endl;
-    stream << GetNumFactors() << endl;
+  void Print(std::ostream& stream) {
+    stream << GetNumVariables() << std::endl;
+    stream << GetNumFactors() << std::endl;
     for (int i = 0; i < GetNumVariables(); ++i) {
-      stream << setprecision(9) << variables_[i]->GetLogPotential() << endl;
+      stream << std::setprecision(9) << variables_[i]->GetLogPotential() << std::endl;
     }
     for (int i = 0; i < GetNumFactors(); ++i) {
       factors_[i]->Print(stream);
@@ -371,19 +374,19 @@ class FactorGraph {
   }
   void SetEtaPSDD(double eta) { psdd_eta_ = eta; }
 
-  int SolveLPMAPWithAD3(vector<double> *posteriors,
-                        vector<double> *additional_posteriors,
+  int SolveLPMAPWithAD3(std::vector<double> *posteriors,
+                        std::vector<double> *additional_posteriors,
                         double *value) {
     double upper_bound;
     return RunAD3(-1e100, posteriors, additional_posteriors, value, &upper_bound);
   }
 
-  int SolveExactMAPWithAD3(vector<double> *posteriors,
-                           vector<double> *additional_posteriors,
+  int SolveExactMAPWithAD3(std::vector<double> *posteriors,
+                           std::vector<double> *additional_posteriors,
                            double *value) {
     double best_lower_bound = -1e100;
     double upper_bound;
-    vector<bool> branched_variables(variables_.size(), false);
+    std::vector<bool> branched_variables(variables_.size(), false);
     int depth = 0;
     int status = RunBranchAndBound(0.0,
                                    branched_variables,
@@ -394,13 +397,13 @@ class FactorGraph {
                                    &best_lower_bound,
                                    &upper_bound);
     if (verbosity_ > 1) {
-      cout << "Solution value for AD3 ILP: " << *value << endl;
+      std::cout << "Solution value for AD3 ILP: " << *value << std::endl;
     }
     return status;
   }
 
-  int SolveLPMAPWithPSDD(vector<double> *posteriors,
-                         vector<double> *additional_posteriors,
+  int SolveLPMAPWithPSDD(std::vector<double> *posteriors,
+                         std::vector<double> *additional_posteriors,
                          double *value) {
     // Add code here for tuning the stepsize.
     double upper_bound;
@@ -420,35 +423,35 @@ class FactorGraph {
     psdd_max_iterations_ = 1000;
   }
 
-  void CopyAdditionalLogPotentials(vector<double>* additional_log_potentials,
-                                   vector<int>* factor_indices);
+  void CopyAdditionalLogPotentials(std::vector<double>* additional_log_potentials,
+                                   std::vector<int>* factor_indices);
 
   int RunPSDD(double lower_bound,
-              vector<double> *posteriors,
-              vector<double> *additional_posteriors,
+              std::vector<double> *posteriors,
+              std::vector<double> *additional_posteriors,
               double *value,
               double *upper_bound);
 
   int RunAD3(double lower_bound,
-             vector<double> *posteriors,
-             vector<double> *additional_posteriors,
+             std::vector<double> *posteriors,
+             std::vector<double> *additional_posteriors,
              double *value,
              double *upper_bound);
 
   int RunBranchAndBound(double cumulative_value,
-                        vector<bool> &branched_variables,
+                        std::vector<bool> &branched_variables,
                         int depth,
-                        vector<double>* posteriors,
-                        vector<double>* additional_posteriors,
+                        std::vector<double>* posteriors,
+                        std::vector<double>* additional_posteriors,
                         double *value,
                         double *best_lower_bound,
                         double *best_upper_bound);
 
  private:
-  vector<BinaryVariable*> variables_;
-  vector<MultiVariable*> multi_variables_;
-  vector<Factor*> factors_;
-  vector<bool> owned_factors_;
+  std::vector<BinaryVariable*> variables_;
+  std::vector<MultiVariable*> multi_variables_;
+  std::vector<Factor*> factors_;
+  std::vector<bool> owned_factors_;
   int num_links_;
 
   // Verbosity level. 0 only displays error/warning messages,
@@ -469,9 +472,11 @@ class FactorGraph {
   double psdd_eta_; // Initial stepsize.
 
   // Parameters for AD3 and PSDD:
-  vector<double> lambdas_;
-  vector<double> maps_;
-  vector<double> maps_av_;
+  std::vector<double> lambdas_;
+  std::vector<double> maps_;
+  std::vector<double> maps_av_;
 };
 
 } // namespace AD3
+
+#endif

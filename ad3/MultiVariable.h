@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef MULTI_VARIABLE_H
-#define MULTI_VARIABLE_H
+#ifndef MULTI_VARIABLE_H_
+#define MULTI_VARIABLE_H_
 
 #include "Factor.h"
 
@@ -32,7 +32,7 @@ class MultiVariable {
   BinaryVariable *GetState(int i) {
     return binary_variables_[i];
   }
-  const vector<BinaryVariable*> &GetStates() { return binary_variables_; }
+  const std::vector<BinaryVariable*> &GetStates() { return binary_variables_; }
 
   // Get/Set log-potentials.
   double GetLogPotential(int i) {
@@ -47,7 +47,7 @@ class MultiVariable {
   void SetId(int id) { id_ = id; };
 
   // Initialize states with binary variables.
-  void Initialize(const vector<BinaryVariable*> &binary_variables) {
+  void Initialize(const std::vector<BinaryVariable*> &binary_variables) {
     binary_variables_ = binary_variables;
   }
 
@@ -63,11 +63,11 @@ class MultiVariable {
   int id_; // Variable id.
   // Indices of the binary variables corresponding
   // to the values.
-  vector<BinaryVariable*> binary_variables_;
+  std::vector<BinaryVariable*> binary_variables_;
   // Factors where this multi-variable belongs to.
-  vector<Factor*> factors_;
+  std::vector<Factor*> factors_;
 };
 
 } // namespace AD3
 
-#endif // MULTI_VARIABLE_H
+#endif

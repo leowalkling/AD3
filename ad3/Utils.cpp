@@ -21,8 +21,6 @@
 #include <assert.h>
 
 //#include <iostream>
-//using namespace std;
-
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
@@ -30,7 +28,11 @@
 #else
   #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
- 
+
+using std::vector;
+using std::pair;
+using std::string;
+
 struct timezone 
 {
   int  tz_minuteswest; /* minutes W of Greenwich */

@@ -46,14 +46,14 @@ class Sibling {
 class FactorSequenceCompressor : public GenericFactor {
  public:
   // Compute the score of a given assignment.
-  void Maximize(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Maximize(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 Configuration &configuration,
                 double *value) {
     // Decode using the Viterbi algorithm.
     int length = length_;
-    vector<vector<double> > values(length);
-    vector<vector<int> > path(length);
+    std::vector<std::vector<double> > values(length);
+    std::vector<std::vector<int> > path(length);
 
     // The start state is m = 0.
     values[0].push_back(0.0);
@@ -83,7 +83,7 @@ class FactorSequenceCompressor : public GenericFactor {
     }
 
     // The end state is m = length.
-    vector<int> best_path(length);
+    std::vector<int> best_path(length);
     best_path[length-1] = -1;
     for (int j = 0; j < length; ++j) {
       int index = index_siblings_[j][length];
@@ -108,7 +108,7 @@ class FactorSequenceCompressor : public GenericFactor {
     }
 
     // Choose whatever configuration is best.
-    vector<int> *modifiers = static_cast<vector<int>*>(configuration);
+    std::vector<int> *modifiers = static_cast<std::vector<int>*>(configuration);
     for (int m = 1; m < length; ++m) {
       if (best_path[m] == m) {
         modifiers->push_back(m);
@@ -117,11 +117,11 @@ class FactorSequenceCompressor : public GenericFactor {
   }
 
   // Compute the score of a given assignment.
-  void Evaluate(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Evaluate(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 const Configuration configuration,
                 double *value) {
-    const vector<int>* modifiers = static_cast<const vector<int>*>(configuration);
+    const std::vector<int>* modifiers = static_cast<const std::vector<int>*>(configuration);
     // Modifiers belong to {1,2,...}
     *value = 0.0;
     int m = 0;
@@ -148,9 +148,9 @@ class FactorSequenceCompressor : public GenericFactor {
   void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
-    const vector<int> *modifiers = static_cast<const vector<int>*>(configuration);
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
+    const std::vector<int> *modifiers = static_cast<const std::vector<int>*>(configuration);
     int m = 0;
     for (int i = 0; i < modifiers->size(); ++i) {
       int s = (*modifiers)[i];
@@ -173,8 +173,8 @@ class FactorSequenceCompressor : public GenericFactor {
   // Count how many common values two configurations have.
   int CountCommonValues(const Configuration &configuration1,
                         const Configuration &configuration2) {
-    const vector<int> *values1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *values2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *values1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *values2 = static_cast<const std::vector<int>*>(configuration2);
     int count = 0;
     int j = 0;
     for (int i = 0; i < values1->size(); ++i) {
@@ -197,8 +197,8 @@ class FactorSequenceCompressor : public GenericFactor {
   bool SameConfiguration(
     const Configuration &configuration1,
     const Configuration &configuration2) {
-    const vector<int> *values1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *values2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *values1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *values2 = static_cast<const std::vector<int>*>(configuration2);
     if (values1->size() != values2->size()) return false;
     for (int i = 0; i < values1->size(); ++i) {
       if ((*values1)[i] != (*values2)[i]) return false;
@@ -210,12 +210,12 @@ class FactorSequenceCompressor : public GenericFactor {
   // Delete configuration.
   void DeleteConfiguration(
     Configuration configuration) {
-    vector<int> *values = static_cast<vector<int>*>(configuration);
+    std::vector<int> *values = static_cast<std::vector<int>*>(configuration);
     delete values;
   }
 
   Configuration CreateConfiguration() {
-    vector<int>* modifiers = new vector<int>;
+    std::vector<int>* modifiers = new std::vector<int>;
     return static_cast<Configuration>(modifiers);
   }
 
@@ -223,9 +223,9 @@ class FactorSequenceCompressor : public GenericFactor {
   // length is relative to the head position.
   // E.g. for a right automaton with h=3 and instance_length=10,
   // length = 7. For a left automaton, it would be length = 3.
-  void Initialize(int length, const vector<Sibling*> &siblings) {
+  void Initialize(int length, const std::vector<Sibling*> &siblings) {
     length_ = length;
-    index_siblings_.assign(length, vector<int>(length+1, -1));
+    index_siblings_.assign(length, std::vector<int>(length+1, -1));
     for (int k = 0; k < siblings.size(); ++k) {
       int h = siblings[k]->head();
       int m = siblings[k]->modifier();
@@ -241,10 +241,10 @@ class FactorSequenceCompressor : public GenericFactor {
     }
   }
 
-  void Initialize(int length, const vector<int> &left_positions,
-                  const vector<int> &right_positions) {
+  void Initialize(int length, const std::vector<int> &left_positions,
+                  const std::vector<int> &right_positions) {
     length_ = length;
-    index_siblings_.assign(length, vector<int>(length+1, -1));
+    index_siblings_.assign(length, std::vector<int>(length+1, -1));
     assert(left_positions.size() == right_positions.size());
     for (int k = 0; k < left_positions.size(); ++k) {
       int h = 0;
@@ -263,7 +263,7 @@ class FactorSequenceCompressor : public GenericFactor {
 
  private:
   int length_;
-  vector<vector<int> > index_siblings_;
+  std::vector<std::vector<int> > index_siblings_;
 };
 
 } // namespace AD3

@@ -30,8 +30,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
  protected:
   virtual double GetNodeScore(int position,
                               int state,
-                              const vector<double> &variable_log_potentials,
-                              const vector<double> &additional_log_potentials) {
+                              const std::vector<double> &variable_log_potentials,
+                              const std::vector<double> &additional_log_potentials) {
     return variable_log_potentials[offset_states_[position] + state];
   }
 
@@ -39,16 +39,16 @@ class FactorGeneralTreeCounts : public GenericFactor {
   virtual double GetEdgeScore(int position,
                               int state,
                               int parent_state,
-                              const vector<double> &variable_log_potentials,
-                              const vector<double> &additional_log_potentials) {
+                              const std::vector<double> &variable_log_potentials,
+                              const std::vector<double> &additional_log_potentials) {
     int index = index_edges_[position][state][parent_state];
     return additional_log_potentials[index];
   }
 
   virtual double GetCountScore(int position,
                                int count,
-                               const vector<double> &variable_log_potentials,
-                               const vector<double> &additional_log_potentials) {
+                               const std::vector<double> &variable_log_potentials,
+                               const std::vector<double> &additional_log_potentials) {
     if (!IsRoot(position)) return 0.0;
     return variable_log_potentials[offset_counts_ + count];
   }
@@ -56,8 +56,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
   virtual void AddNodePosterior(int position,
                                 int state,
                                 double weight,
-                                vector<double> *variable_posteriors,
-                                vector<double> *additional_posteriors) {
+                                std::vector<double> *variable_posteriors,
+                                std::vector<double> *additional_posteriors) {
     (*variable_posteriors)[offset_states_[position] + state] += weight;
   }
 
@@ -66,8 +66,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
                                 int state,
                                 int parent_state,
                                 double weight,
-                                vector<double> *variable_posteriors,
-                                vector<double> *additional_posteriors) {
+                                std::vector<double> *variable_posteriors,
+                                std::vector<double> *additional_posteriors) {
     int index = index_edges_[position][state][parent_state];
     (*additional_posteriors)[index] += weight;
   }
@@ -75,8 +75,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
   virtual void AddCountScore(int position,
                              int count,
                              double weight,
-                             vector<double> *variable_posteriors,
-                             vector<double> *additional_posteriors) {
+                             std::vector<double> *variable_posteriors,
+                             std::vector<double> *additional_posteriors) {
     if (!IsRoot(position)) return;
     (*variable_posteriors)[offset_counts_ + count] += weight;
   }
@@ -105,12 +105,12 @@ class FactorGeneralTreeCounts : public GenericFactor {
     return -std::numeric_limits<double>::infinity();
   }
 
-  void RunViterbiForward(const vector<double> &variable_log_potentials,
-                         const vector<double> &additional_log_potentials,
+  void RunViterbiForward(const std::vector<double> &variable_log_potentials,
+                         const std::vector<double> &additional_log_potentials,
                          int i,
-                         vector<vector<vector<double> > > *values,
-                         vector<vector<vector<int> > > *path,
-                         vector<vector<vector<int> > > *path_bin) {
+                         std::vector<std::vector<std::vector<double> > > *values,
+                         std::vector<std::vector<std::vector<int> > > *path,
+                         std::vector<std::vector<std::vector<int> > > *path_bin) {
     int num_states = GetNumStates(i);
     (*values)[i].resize(num_states);
 
@@ -176,7 +176,7 @@ class FactorGeneralTreeCounts : public GenericFactor {
         // and for each bin (in the child node) get the best label
         // and corresponding value for that bin.
         // This can be done for each child node independently.
-        vector<vector<int> > best_labels(GetNumChildren(i));
+        std::vector<std::vector<int> > best_labels(GetNumChildren(i));
         for (int t = 0; t < GetNumChildren(i); ++t) {
           int j = GetChild(i, t);
           // NOTE: below it could be any other state and not necessarily
@@ -240,8 +240,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
         // zero-state of the current node).
         // best_bin_sequences will store the best bins for the children
         // nodes that achieve each of the best configurations above.
-        vector<double> best_values(num_bins, MinusInfinity());
-        vector<vector<int> > best_bin_sequences(num_bins);
+        std::vector<double> best_values(num_bins, MinusInfinity());
+        std::vector<std::vector<int> > best_bin_sequences(num_bins);
         // Total number of bins after merging each child.
         int num_bins_total = 0;
         //best_values[0] = 0.0;
@@ -263,9 +263,9 @@ class FactorGeneralTreeCounts : public GenericFactor {
           //  num_bins_accum = GetMaxNumBins();
           //}
 
-          vector<double> best_values_partial(num_bins_accum,
+          std::vector<double> best_values_partial(num_bins_accum,
                                              MinusInfinity());
-          vector<vector<int> >
+          std::vector<std::vector<int> >
             best_bin_sequences_partial(num_bins_accum);
 
           for (int b = 0; b < num_bins_accum; ++b) {
@@ -447,9 +447,9 @@ class FactorGeneralTreeCounts : public GenericFactor {
   }
 
   void RunViterbiBacktrack(int i, int state, int bin,
-                           const vector<vector<vector<int> > > &path,
-                           const vector<vector<vector<int> > > &path_bin,
-                           vector<int> *best_configuration) {
+                           const std::vector<std::vector<std::vector<int> > > &path,
+                           const std::vector<std::vector<std::vector<int> > > &path_bin,
+                           std::vector<int> *best_configuration) {
     (*best_configuration)[i] = state;
     //if (CountsForBudget(i, state)) --bin; 
 
@@ -461,9 +461,9 @@ class FactorGeneralTreeCounts : public GenericFactor {
     }
   }
 
-  void EvaluateForward(const vector<double> &variable_log_potentials,
-                       const vector<double> &additional_log_potentials,
-                       const vector<int> &configuration,
+  void EvaluateForward(const std::vector<double> &variable_log_potentials,
+                       const std::vector<double> &additional_log_potentials,
+                       const std::vector<int> &configuration,
                        int i,
                        int *count,
                        double *value) {
@@ -501,12 +501,12 @@ class FactorGeneralTreeCounts : public GenericFactor {
     }
   }
 
-  void UpdateMarginalsForward(const vector<int> &configuration,
+  void UpdateMarginalsForward(const std::vector<int> &configuration,
                               double weight,
                               int i,
                               int *count,
-                              vector<double> *variable_posteriors,
-                              vector<double> *additional_posteriors) {
+                              std::vector<double> *variable_posteriors,
+                              std::vector<double> *additional_posteriors) {
     int num_states = GetNumStates(i);
     int k = configuration[i];
     if (CountsForBudget(i, k)) ++(*count);
@@ -545,15 +545,15 @@ class FactorGeneralTreeCounts : public GenericFactor {
 
  public:
   // Obtain the best configuration.
-  void Maximize(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Maximize(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 Configuration &configuration,
                 double *value) {
     // Decode using the Viterbi algorithm.
     int length = GetLength();
-    vector<vector<vector<double> > > values(length);
-    vector<vector<vector<int> > > path(length);
-    vector<vector<vector<int> > > path_bin(length);
+    std::vector<std::vector<std::vector<double> > > values(length);
+    std::vector<std::vector<std::vector<int> > > path(length);
+    std::vector<std::vector<std::vector<int> > > path_bin(length);
 
     int root = GetRoot();
     RunViterbiForward(variable_log_potentials,
@@ -586,7 +586,7 @@ class FactorGeneralTreeCounts : public GenericFactor {
     //cout << "Backtracking..." << endl;
 
     // Path (state sequence) backtracking.
-    vector<int> *sequence = static_cast<vector<int>*>(configuration);
+    std::vector<int> *sequence = static_cast<std::vector<int>*>(configuration);
     assert(sequence->size() == length);
     RunViterbiBacktrack(root, best_state, best_bin,
                         path, path_bin, sequence);
@@ -599,12 +599,12 @@ class FactorGeneralTreeCounts : public GenericFactor {
   }
 
   // Compute the score of a given assignment.
-  void Evaluate(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Evaluate(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 const Configuration configuration,
                 double *value) {
-    const vector<int>* sequence =
-        static_cast<const vector<int>*>(configuration);
+    const std::vector<int>* sequence =
+        static_cast<const std::vector<int>*>(configuration);
     *value = 0.0;
 
     int count = 0;
@@ -625,10 +625,10 @@ class FactorGeneralTreeCounts : public GenericFactor {
   void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
-    const vector<int> *sequence =
-        static_cast<const vector<int>*>(configuration);
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
+    const std::vector<int> *sequence =
+        static_cast<const std::vector<int>*>(configuration);
 
     int count = 0;
     UpdateMarginalsForward(*sequence,
@@ -649,10 +649,10 @@ class FactorGeneralTreeCounts : public GenericFactor {
   // Count how many common values two configurations have.
   int CountCommonValues(const Configuration &configuration1,
                         const Configuration &configuration2) {
-    const vector<int> *sequence1 =
-        static_cast<const vector<int>*>(configuration1);
-    const vector<int> *sequence2 =
-        static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *sequence1 =
+        static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *sequence2 =
+        static_cast<const std::vector<int>*>(configuration2);
     assert(sequence1->size() == sequence2->size());
     int count = 0;
     int b1 = 0;
@@ -672,8 +672,8 @@ class FactorGeneralTreeCounts : public GenericFactor {
   bool SameConfiguration(
     const Configuration &configuration1,
     const Configuration &configuration2) {
-    const vector<int> *sequence1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *sequence2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *sequence1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *sequence2 = static_cast<const std::vector<int>*>(configuration2);
     assert(sequence1->size() == sequence2->size());
     for (int i = 0; i < sequence1->size(); ++i) {
       if ((*sequence1)[i] != (*sequence2)[i]) return false;
@@ -684,13 +684,13 @@ class FactorGeneralTreeCounts : public GenericFactor {
   // Delete configuration.
   void DeleteConfiguration(
     Configuration configuration) {
-    vector<int> *sequence = static_cast<vector<int>*>(configuration);
+    std::vector<int> *sequence = static_cast<std::vector<int>*>(configuration);
     delete sequence;
   }
 
   Configuration CreateConfiguration() {
     int length = GetLength();
-    vector<int>* sequence = new vector<int>(length, -1);
+    std::vector<int>* sequence = new std::vector<int>(length, -1);
     return static_cast<Configuration>(sequence); 
   }
 
@@ -701,16 +701,16 @@ class FactorGeneralTreeCounts : public GenericFactor {
   // in the tree. No start/stop positions are used.
   // Note: the variables and the the additional log-potentials must be ordered
   // properly.
-  void Initialize(const vector<int> &parents,
-                  const vector<int> &num_states) {
-    vector<bool> counts_for_budget(parents.size());
+  void Initialize(const std::vector<int> &parents,
+                  const std::vector<int> &num_states) {
+    std::vector<bool> counts_for_budget(parents.size());
     counts_for_budget.assign(parents.size(), true);
     Initialize(parents, num_states, counts_for_budget);
   }
 
-  void Initialize(const vector<int> &parents,
-                  const vector<int> &num_states,
-                  vector<bool> &counts_for_budget) {
+  void Initialize(const std::vector<int> &parents,
+                  const std::vector<int> &num_states,
+                  std::vector<bool> &counts_for_budget) {
     int length = parents.size();
     parents_ = parents;
     counts_for_budget_ = counts_for_budget;    
@@ -754,18 +754,18 @@ class FactorGeneralTreeCounts : public GenericFactor {
 
  protected:
   // Parent of each node.
-  vector<int> parents_;
+  std::vector<int> parents_;
   // Children of each node.
-  vector<vector<int> > children_;
+  std::vector<std::vector<int> > children_;
   // Number of states for each position.
-  vector<int> num_states_;
+  std::vector<int> num_states_;
   // Tells if each position contributes to the budget.
-  vector<bool> counts_for_budget_;
+  std::vector<bool> counts_for_budget_;
   // Offset of states for each position.
-  vector<int> offset_states_;
+  std::vector<int> offset_states_;
   // At each position, map from edges of states to a global index which 
   // matches the index of additional_log_potentials_.
-  vector<vector<vector<int> > > index_edges_; 
+  std::vector<std::vector<std::vector<int> > > index_edges_; 
   // Offset of counts.
   int offset_counts_;
 };

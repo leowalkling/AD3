@@ -16,9 +16,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FACTOR_TREE_H_
-#define FACTOR_TREE_H_
-
 #include "FactorTree.h"
 #include <iostream>
 #include <vector>
@@ -65,6 +62,8 @@ int FactorTree::RunCLE(const vector<double>& scores,
     assert(r >= 0);
     *value += scores[r];
   }
+
+  return 0;
 }
 
 void FactorTree::RunChuLiuEdmondsIteration(vector<bool> *disabled,
@@ -249,5 +248,3 @@ void FactorTree::RunChuLiuEdmondsIteration(vector<bool> *disabled,
 }
 
 } // namespace AD3
-
-#endif // FACTOR_TREE_H_

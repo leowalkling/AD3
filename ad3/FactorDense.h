@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FACTOR_DENSE
-#define FACTOR_DENSE
+#ifndef FACTOR_DENSE_H_
+#define FACTOR_DENSE_H_
 
 #include "GenericFactor.h"
 #include "MultiVariable.h"
@@ -32,7 +32,7 @@ class FactorDense : public GenericFactor {
   int type() { return FactorTypes::FACTOR_MULTI_DENSE; }
 
   // Print as a string.
-  void Print(ostream& stream) {
+  void Print(std::ostream& stream) {
     stream << "DENSE";
     Factor::Print(stream);
 
@@ -48,18 +48,18 @@ class FactorDense : public GenericFactor {
     // Write the additional log-potentials.
     int num_configurations = GetNumConfigurations();
     for (int index = 0; index < num_configurations; ++index) {
-        stream << " " << setprecision(9) << additional_log_potentials_[index];
+        stream << " " << std::setprecision(9) << additional_log_potentials_[index];
     }
       
-    stream << endl;
+    stream << std::endl;
   }
 
   // Compute the score of a given assignment.
-  void Maximize(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Maximize(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 Configuration &configuration,
                 double *value) {
-    vector<int> *states = static_cast<vector<int>*>(configuration);
+    std::vector<int> *states = static_cast<std::vector<int>*>(configuration);
     int best = -1;
     *value = -1e12;
     for (int index = 0;
@@ -81,12 +81,12 @@ class FactorDense : public GenericFactor {
   }
 
   // Compute the score of a given assignment.
-  void Evaluate(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Evaluate(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 const Configuration configuration,
                 double *value) {
-    const vector<int>* states =
-        static_cast<const vector<int>*>(configuration);
+    const std::vector<int>* states =
+        static_cast<const std::vector<int>*>(configuration);
     *value = 0.0;
     int offset_states = 0;
     for (int i = 0; i < states->size(); ++i) {
@@ -103,10 +103,10 @@ class FactorDense : public GenericFactor {
   void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
-    const vector<int> *states =
-        static_cast<const vector<int>*>(configuration);
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
+    const std::vector<int> *states =
+        static_cast<const std::vector<int>*>(configuration);
     int offset_states = 0;
     for (int i = 0; i < states->size(); ++i) {
       int state = (*states)[i];
@@ -120,10 +120,10 @@ class FactorDense : public GenericFactor {
   // Count how many common values two configurations have.
   int CountCommonValues(const Configuration &configuration1,
                         const Configuration &configuration2) {
-    const vector<int> *states1 =
-        static_cast<const vector<int>*>(configuration1);
-    const vector<int> *states2 =
-        static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *states1 =
+        static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *states2 =
+        static_cast<const std::vector<int>*>(configuration2);
     assert(states1->size() == states2->size());
     int count = 0;
     for (int i = 0; i < states1->size(); ++i) {
@@ -136,8 +136,8 @@ class FactorDense : public GenericFactor {
   bool SameConfiguration(
     const Configuration &configuration1,
     const Configuration &configuration2) {
-    const vector<int> *states1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *states2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *states1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *states2 = static_cast<const std::vector<int>*>(configuration2);
     assert(states1->size() == states2->size());
     for (int i = 0; i < states1->size(); ++i) {
       if ((*states1)[i] != (*states2)[i]) return false;
@@ -148,13 +148,13 @@ class FactorDense : public GenericFactor {
   // Delete configuration.
   void DeleteConfiguration(
     Configuration configuration) {
-    vector<int> *states = static_cast<vector<int>*>(configuration);
+    std::vector<int> *states = static_cast<std::vector<int>*>(configuration);
     delete states;
   }
 
   Configuration CreateConfiguration() {
     int length = multi_variables_.size();
-    vector<int>* states = new vector<int>(length, -1);
+    std::vector<int>* states = new std::vector<int>(length, -1);
     return static_cast<Configuration>(states); 
   }
 
@@ -164,7 +164,7 @@ class FactorDense : public GenericFactor {
   // the factor.
   // Note: the variables and the additional log-potentials must be ordered
   // properly.
-  void Initialize(const vector<MultiVariable*> &multi_variables) {
+  void Initialize(const std::vector<MultiVariable*> &multi_variables) {
     multi_variables_ = multi_variables;
 
     // Build offsets.
@@ -188,7 +188,7 @@ class FactorDense : public GenericFactor {
   }
  
   // Find the configuration index given the array of states.
-  int GetConfigurationIndex(const vector<int>& states) {
+  int GetConfigurationIndex(const std::vector<int>& states) {
     int index = states[0];
     for (int i = 1; i < states.size(); ++i) {
       index *= multi_variables_[i]->GetNumStates();
@@ -198,7 +198,7 @@ class FactorDense : public GenericFactor {
   }
 
   // Find the array of states corresponding to a configuration index.
-  void GetConfigurationStates(int index, vector<int> *states) {
+  void GetConfigurationStates(int index, std::vector<int> *states) {
     int tmp = 1;
     for (int i = 1; i < states->size(); ++i) {
       tmp *= multi_variables_[i]->GetNumStates();
@@ -217,11 +217,11 @@ class FactorDense : public GenericFactor {
 
  private:
   // Multi-variables linked to this factor.
-  vector<MultiVariable*> multi_variables_;
+  std::vector<MultiVariable*> multi_variables_;
   // Offsets of the variables in the pool of values.
-  vector<int> variable_offsets_;
+  std::vector<int> variable_offsets_;
 };
 
 } // namespace AD3
 
-#endif // FACTOR_DENSE
+#endif

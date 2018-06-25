@@ -35,6 +35,8 @@ static int num_inversions_incremental = 0;
 static int num_eigenvalue_computations = 0;
 #endif
 
+using namespace std;
+
 void GenericFactor::ClearActiveSet() {
   for (int j = 0; j < active_set_.size(); ++j) {
     DeleteConfiguration(active_set_[j]);

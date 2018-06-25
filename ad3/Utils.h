@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <time.h>
@@ -39,8 +39,6 @@ struct timeval {
 extern int gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
-using namespace std;
-
 namespace AD3 {
 
 #define NEARLY_EQ_TOL(a,b,tol) (((a)-(b))*((a)-(b))<=(tol))
@@ -56,46 +54,46 @@ extern int diff_ms(timeval t1, timeval t2);
 
 extern int diff_us(timeval t1, timeval t2);
 
-extern void InsertionSort(pair<double, int> arr[], int length);
+extern void InsertionSort(std::pair<double, int> arr[], int length);
 
 extern int project_onto_simplex_cached(double* x,
 				       int d,
 				       double r, 
-				       vector<pair<double,int> >& y);
+				       std::vector<std::pair<double,int> >& y);
 
 extern int project_onto_simplex(double* x, int d, double r);
 
 extern int project_onto_cone_cached(double* x, int d,
-				    vector<pair<double,int> >& y);
+				    std::vector<std::pair<double,int> >& y);
 				    
 extern int project_onto_budget_constraint(double* x, int d, double budget);	
 
 extern int project_onto_budget_constraint_cached(double* x,
                                                  int d,
                                                  double budget, 
-                                                 vector<pair<double,int> >& y);
+                                                 std::vector<std::pair<double,int> >& y);
 
 extern int project_onto_knapsack_constraint(double* x, double* costs, int d,
                                             double budget);
 
-extern int solve_canonical_qp_knapsack(const vector<double> &lower_bounds,
-                                       const vector<double> &upper_bounds,
-                                       const vector<double> &weights,
+extern int solve_canonical_qp_knapsack(const std::vector<double> &lower_bounds,
+                                       const std::vector<double> &upper_bounds,
+                                       const std::vector<double> &weights,
                                        double total_weight,
-                                       vector<double> *solution);
+                                       std::vector<double> *solution);
 
                                                  
-extern void StringSplit(const string &str,
-			const string &delim,
-			vector<string> *results);
+extern void StringSplit(const std::string &str,
+			const std::string &delim,
+			std::vector<std::string> *results);
 
-extern void TrimComments(const string &delim, string *line);
+extern void TrimComments(const std::string &delim, std::string *line);
 
-extern void TrimLeft(const string &delim, string *line);
+extern void TrimLeft(const std::string &delim, std::string *line);
 
-extern void TrimRight(const string &delim, string *line);
+extern void TrimRight(const std::string &delim, std::string *line);
 
-extern void Trim(const string &delim, string *line);
+extern void Trim(const std::string &delim, std::string *line);
 
 } // namespace AD3
 

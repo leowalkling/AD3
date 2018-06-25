@@ -42,10 +42,13 @@
 #include "FactorTree.h"
 #include <cstdlib>
 
+using std::vector;
+using std::cout;
+using std::endl;
 using namespace AD3;
 
 void GetBestParse(int sentence_length,
-                  const vector<Arc*> &arcs, const vector<Sibling*> &siblings,
+                  const vector<AD3::Arc*> &arcs, const vector<Sibling*> &siblings,
                   const vector<double> &arc_scores,
                   const vector<double> &sibling_scores,
                   Factor *tree_factor, const vector<double> &posteriors);
@@ -58,13 +61,13 @@ int main(int argc, char **argv) {
        << endl;
 
   // Create arcs.
-  vector<Arc*> arcs;
+  vector<AD3::Arc*> arcs;
   vector<vector<int> > index_arcs(sentence_length,
     vector<int>(sentence_length, -1));
   for (int m = 1; m < sentence_length; ++m) {
     for (int h = 0; h < sentence_length; ++h) {
       if (h == m) continue;
-      Arc *arc = new Arc(h, m);
+	  AD3::Arc *arc = new AD3::Arc(h, m);
       index_arcs[h][m] = arcs.size();
       arcs.push_back(arc);
     }
@@ -247,7 +250,7 @@ int main(int argc, char **argv) {
 // the Chu-Liu-Edmonds algorithm.
 
 void GetBestParse(int sentence_length,
-                  const vector<Arc*> &arcs, const vector<Sibling*> &siblings,
+                  const vector<AD3::Arc*> &arcs, const vector<Sibling*> &siblings,
                   const vector<double> &arc_scores,
                   const vector<double> &sibling_scores,
                   Factor *tree_factor, const vector<double> &posteriors) {

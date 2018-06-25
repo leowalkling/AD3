@@ -28,8 +28,8 @@ class FactorCompressionBudget : public GenericFactor {
  protected:
   double GetNodeScore(int position,
                       int state,
-                      const vector<double> &variable_log_potentials,
-                      const vector<double> &additional_log_potentials) {
+                      const std::vector<double> &variable_log_potentials,
+                      const std::vector<double> &additional_log_potentials) {
     if (state == 0) return 0.0;
     return variable_log_potentials[position];
   }
@@ -38,8 +38,8 @@ class FactorCompressionBudget : public GenericFactor {
   double GetEdgeScore(int position,
                       int previous_state,
                       int state,
-                      const vector<double> &variable_log_potentials,
-                      const vector<double> &additional_log_potentials) {
+                      const std::vector<double> &variable_log_potentials,
+                      const std::vector<double> &additional_log_potentials) {
     int index = index_edges_[position][previous_state][state];
     if (index < 0) {
       // This edge is handled as a variable, rather than an additional
@@ -54,8 +54,8 @@ class FactorCompressionBudget : public GenericFactor {
   void AddNodePosterior(int position,
                         int state,
                         double weight,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors) {
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors) {
     if (state == 0) return;
     (*variable_posteriors)[position] += weight;
   }
@@ -65,8 +65,8 @@ class FactorCompressionBudget : public GenericFactor {
                         int previous_state,
                         int state,
                         double weight,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors) {
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors) {
     int index = index_edges_[position][previous_state][state];
     if (index < 0) {
       // This edge is handled as a variable, rather than an additional
@@ -102,15 +102,15 @@ class FactorCompressionBudget : public GenericFactor {
 
  public:
   // Obtain the best configuration.
-  void Maximize(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Maximize(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 Configuration &configuration,
                 double *value) {
     //cout << "Begin Maximize" << endl;
     // Decode using the Viterbi algorithm.
     int length = GetLength();
-    vector<vector<vector<double> > > values(length);
-    vector<vector<vector<int> > > path(length);
+    std::vector<std::vector<std::vector<double> > > values(length);
+    std::vector<std::vector<std::vector<int> > > path(length);
 
     // Initialization.
     // Assume budget_ >= 1.
@@ -198,7 +198,7 @@ class FactorCompressionBudget : public GenericFactor {
     //    cout << best_value << endl;
     //    cout << "chk3" << endl;
     // Path (state sequence) backtracking.
-    vector<int> sequence(length);
+    std::vector<int> sequence(length);
     sequence[length - 1] = best;
     int b = best_bin;
     for (int i = length - 1; i > 0; --i) {
@@ -210,7 +210,7 @@ class FactorCompressionBudget : public GenericFactor {
 
     //    cout << "chk4" << endl;
 
-    vector<int> *selected_nodes = static_cast<vector<int>*>(configuration);
+    std::vector<int> *selected_nodes = static_cast<std::vector<int>*>(configuration);
     for (int i = 0; i < length; ++i) {
       if (sequence[i]) selected_nodes->push_back(i);
     }
@@ -220,15 +220,15 @@ class FactorCompressionBudget : public GenericFactor {
   }
 
   // Compute the score of a given assignment.
-  void Evaluate(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Evaluate(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 const Configuration configuration,
                 double *value) {
-    const vector<int>* selected_nodes =
-        static_cast<const vector<int>*>(configuration);
+    const std::vector<int>* selected_nodes =
+        static_cast<const std::vector<int>*>(configuration);
     *value = 0.0;
     int length = GetLength();
-    vector<int> sequence(length, 0);
+    std::vector<int> sequence(length, 0);
     for (int k = 0; k < selected_nodes->size(); ++k) {
       int i = (*selected_nodes)[k];
       sequence[i] = 1;
@@ -254,13 +254,13 @@ class FactorCompressionBudget : public GenericFactor {
   void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
-    const vector<int> *selected_nodes =
-        static_cast<const vector<int>*>(configuration);
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
+    const std::vector<int> *selected_nodes =
+        static_cast<const std::vector<int>*>(configuration);
 
     int length = GetLength();
-    vector<int> sequence(length, 0);
+    std::vector<int> sequence(length, 0);
     for (int k = 0; k < selected_nodes->size(); ++k) {
       int i = (*selected_nodes)[k];
       sequence[i] = 1;
@@ -285,10 +285,10 @@ class FactorCompressionBudget : public GenericFactor {
   // Count how many common values two configurations have.
   int CountCommonValues(const Configuration &configuration1,
                         const Configuration &configuration2) {
-    const vector<int> *selected_nodes1 =
-        static_cast<const vector<int>*>(configuration1);
-    const vector<int> *selected_nodes2 =
-        static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *selected_nodes1 =
+        static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *selected_nodes2 =
+        static_cast<const std::vector<int>*>(configuration2);
     int count = 0;
     int j = 0;
     for (int i = 0; i < selected_nodes1->size(); ++i) {
@@ -318,8 +318,8 @@ class FactorCompressionBudget : public GenericFactor {
   bool SameConfiguration(
     const Configuration &configuration1,
     const Configuration &configuration2) {
-    const vector<int> *selected_nodes1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *selected_nodes2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *selected_nodes1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *selected_nodes2 = static_cast<const std::vector<int>*>(configuration2);
     if (selected_nodes1->size() != selected_nodes2->size()) return false;
     for (int i = 0; i < selected_nodes1->size(); ++i) {
       if ((*selected_nodes1)[i] != (*selected_nodes2)[i]) return false;
@@ -330,12 +330,12 @@ class FactorCompressionBudget : public GenericFactor {
   // Delete configuration.
   void DeleteConfiguration(
     Configuration configuration) {
-    vector<int> *selected_nodes = static_cast<vector<int>*>(configuration);
+    std::vector<int> *selected_nodes = static_cast<std::vector<int>*>(configuration);
     delete selected_nodes;
   }
 
   Configuration CreateConfiguration() {
-    vector<int> *selected_nodes = new vector<int>;
+    std::vector<int> *selected_nodes = new std::vector<int>;
     return static_cast<Configuration>(selected_nodes);
   }
 
@@ -347,20 +347,20 @@ class FactorCompressionBudget : public GenericFactor {
   // "length" is the length of the sequence. The start and stop positions are not considered here.
   // "budget" is the maximum number of elements that can be active
   // (excluding the ones that do not count to the budget).
-  // "count_to_budget" is a boolean vector of length "length" which
+  // "count_to_budget" is a boolean std::vector of length "length" which
   // tells for each element if it counts to the budget.
-  // "bigram_positions" is a vector containing the positions where 
-  // bigrams start (each bigram in this vector will have a score
+  // "bigram_positions" is a std::vector containing the positions where 
+  // bigrams start (each bigram in this std::vector will have a score
   // in variable_log_potentials and will correspond to a binary
   // variable). 
   void Initialize(int length, int budget,
-                  vector<bool> &counts_for_budget,
-                  vector<int> &bigram_positions) {
+                  std::vector<bool> &counts_for_budget,
+                  std::vector<int> &bigram_positions) {
     length_ = length;
     budget_ = budget;
     counts_for_budget_ = counts_for_budget;
 
-    vector<int> bigram_variables(length+1);
+    std::vector<int> bigram_variables(length+1);
     bigram_variables.assign(length+1, -1);
     int index = 0;
     for (int k = 0; k < bigram_positions.size(); ++k) {
@@ -406,10 +406,10 @@ class FactorCompressionBudget : public GenericFactor {
   // Length of the sequence.
   int length_;
   // Tells if each position contributes to the budget.
-  vector<bool> counts_for_budget_;
+  std::vector<bool> counts_for_budget_;
   // At each position, map from edges of states to a global index which
   // matches the index of additional_log_potentials_.
-  vector<vector<vector<int> > > index_edges_;
+  std::vector<std::vector<std::vector<int> > > index_edges_;
 };
 
 } // namespace AD3

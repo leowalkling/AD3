@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with AD3 2.1.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FACTOR_BINARY_TREE
-#define FACTOR_BINARY_TREE
+#ifndef FACTOR_BINARY_TREE_H_
+#define FACTOR_BINARY_TREE_H_
 
 #include "ad3/GenericFactor.h"
 #include "examples/cpp/summarization/FactorGeneralTree.h"
@@ -28,8 +28,8 @@ class FactorBinaryTree : public FactorGeneralTree {
  protected:
   double GetNodeScore(int position,
                       int state,
-                      const vector<double> &variable_log_potentials,
-                      const vector<double> &additional_log_potentials) {
+                      const std::vector<double> &variable_log_potentials,
+                      const std::vector<double> &additional_log_potentials) {
     if (state == 0) return 0.0;
     return variable_log_potentials[position];
   }
@@ -38,8 +38,8 @@ class FactorBinaryTree : public FactorGeneralTree {
   double GetEdgeScore(int position,
                       int state,
                       int parent_state,
-                      const vector<double> &variable_log_potentials,
-                      const vector<double> &additional_log_potentials) {
+                      const std::vector<double> &variable_log_potentials,
+                      const std::vector<double> &additional_log_potentials) {
     int index = index_edges_[position][state][parent_state];
     return additional_log_potentials[index];
   }
@@ -47,8 +47,8 @@ class FactorBinaryTree : public FactorGeneralTree {
   void AddNodePosterior(int position,
                         int state,
                         double weight,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors) {
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors) {
     if (state == 0) return;
     (*variable_posteriors)[position] += weight;
   }
@@ -58,8 +58,8 @@ class FactorBinaryTree : public FactorGeneralTree {
                         int state,
                         int parent_state,
                         double weight,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors) {
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors) {
     int index = index_edges_[position][state][parent_state];
     (*additional_posteriors)[index] += weight;
   }
@@ -70,14 +70,14 @@ class FactorBinaryTree : public FactorGeneralTree {
 
  public:
   // Obtain the best configuration.
-  void Maximize(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Maximize(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 Configuration &configuration,
                 double *value) {
     // Decode using the Viterbi algorithm.
     int length = GetLength();
-    vector<vector<double> > values(length);
-    vector<vector<int> > path(length);
+    std::vector<std::vector<double> > values(length);
+    std::vector<std::vector<int> > path(length);
 
     int root = GetRoot();
     RunViterbiForward(variable_log_potentials,
@@ -88,24 +88,24 @@ class FactorBinaryTree : public FactorGeneralTree {
     *value = values[root][best_state];
 
     // Path (state sequence) backtracking.
-    vector<int> sequence(length);
+    std::vector<int> sequence(length);
     RunViterbiBacktrack(root, best_state, path, &sequence);
-    vector<int> *selected_nodes = static_cast<vector<int>*>(configuration);
+    std::vector<int> *selected_nodes = static_cast<std::vector<int>*>(configuration);
     for (int i = 0; i < length; ++i) {
       if (sequence[i]) selected_nodes->push_back(i);
     }
   }
 
   // Compute the score of a given assignment.
-  void Evaluate(const vector<double> &variable_log_potentials,
-                const vector<double> &additional_log_potentials,
+  void Evaluate(const std::vector<double> &variable_log_potentials,
+                const std::vector<double> &additional_log_potentials,
                 const Configuration configuration,
                 double *value) {
-    const vector<int>* selected_nodes =
-        static_cast<const vector<int>*>(configuration);
+    const std::vector<int>* selected_nodes =
+        static_cast<const std::vector<int>*>(configuration);
     *value = 0.0;
     int length = GetLength();
-    vector<int> sequence(length, 0);
+    std::vector<int> sequence(length, 0);
     for (int k = 0; k < selected_nodes->size(); ++k) {
       int i = (*selected_nodes)[k];
       sequence[i] = 1;
@@ -123,13 +123,13 @@ class FactorBinaryTree : public FactorGeneralTree {
   void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
-    const vector<int> *selected_nodes =
-        static_cast<const vector<int>*>(configuration);
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
+    const std::vector<int> *selected_nodes =
+        static_cast<const std::vector<int>*>(configuration);
 
     int length = GetLength();
-    vector<int> sequence(length, 0);
+    std::vector<int> sequence(length, 0);
     for (int k = 0; k < selected_nodes->size(); ++k) {
       int i = (*selected_nodes)[k];
       sequence[i] = 1;
@@ -145,10 +145,10 @@ class FactorBinaryTree : public FactorGeneralTree {
   // Count how many common values two configurations have.
   int CountCommonValues(const Configuration &configuration1,
                         const Configuration &configuration2) {
-    const vector<int> *selected_nodes1 =
-        static_cast<const vector<int>*>(configuration1);
-    const vector<int> *selected_nodes2 =
-        static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *selected_nodes1 =
+        static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *selected_nodes2 =
+        static_cast<const std::vector<int>*>(configuration2);
     int count = 0;
     int j = 0;
     for (int i = 0; i < selected_nodes1->size(); ++i) {
@@ -167,8 +167,8 @@ class FactorBinaryTree : public FactorGeneralTree {
   bool SameConfiguration(
     const Configuration &configuration1,
     const Configuration &configuration2) {
-    const vector<int> *selected_nodes1 = static_cast<const vector<int>*>(configuration1);
-    const vector<int> *selected_nodes2 = static_cast<const vector<int>*>(configuration2);
+    const std::vector<int> *selected_nodes1 = static_cast<const std::vector<int>*>(configuration1);
+    const std::vector<int> *selected_nodes2 = static_cast<const std::vector<int>*>(configuration2);
     if (selected_nodes1->size() != selected_nodes2->size()) return false;
     for (int i = 0; i < selected_nodes1->size(); ++i) {
       if ((*selected_nodes1)[i] != (*selected_nodes2)[i]) return false;
@@ -179,12 +179,12 @@ class FactorBinaryTree : public FactorGeneralTree {
   // Delete configuration.
   void DeleteConfiguration(
     Configuration configuration) {
-    vector<int> *selected_nodes = static_cast<vector<int>*>(configuration);
+    std::vector<int> *selected_nodes = static_cast<std::vector<int>*>(configuration);
     delete selected_nodes;
   }
 
   Configuration CreateConfiguration() {
-    vector<int>* selected_nodes = new vector<int>;
+    std::vector<int>* selected_nodes = new std::vector<int>;
     return static_cast<Configuration>(selected_nodes);
   }
 
@@ -195,7 +195,7 @@ class FactorBinaryTree : public FactorGeneralTree {
   // in the tree. No start/stop positions are used.
   // Note: the variables and the the additional log-potentials must be ordered
   // properly.
-  void Initialize(const vector<int> &parents) {
+  void Initialize(const std::vector<int> &parents) {
     int length = parents.size();
     parents_ = parents;
     children_.resize(length);
@@ -230,4 +230,4 @@ class FactorBinaryTree : public FactorGeneralTree {
 
 } // namespace AD3
 
-#endif // FACTOR_GENERAL_TREE
+#endif // FACTOR_GENERAL_TREE_H_

@@ -19,6 +19,9 @@
 #include "Factor.h"
 #include "Utils.h"
 
+using std::vector;
+using std::pair;
+
 namespace AD3 {
 
 // Add evidence information to the factor.

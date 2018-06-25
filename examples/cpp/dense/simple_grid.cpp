@@ -34,6 +34,8 @@
 #include "FactorSequence.h"
 #include <cstdlib>
 
+using namespace std;
+
 void GetBestConfiguration(int grid_size, int num_states,
                           const vector<vector<AD3::MultiVariable*> >
                             &multi_variables,

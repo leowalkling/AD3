@@ -23,7 +23,7 @@
 #include <assert.h>
 #include "ad3/FactorGraph.h"
 #include "ad3/Utils.h"
-#include "FactorDense.h"
+#include "ad3/FactorDense.h"
 #include "FactorSequence.h"
 #include "FactorTree.h"
 #include "FactorHeadAutomaton.h"
@@ -549,12 +549,12 @@ int LoadGraph(ifstream &file_graph,
       // Read the sentence length.
       int sentence_length = atoi(fields[offset+num_links].c_str());
       // Read the arcs.
-      vector<Arc*> arcs(binary_variables.size());
+      vector<AD3::Arc*> arcs(binary_variables.size());
       for (int r = 0; r < binary_variables.size(); ++r) {
         //cout << fields.size() << " " << offset+num_links+2*r+1 << endl;
         int h = atoi(fields[offset+num_links+1+2*r].c_str());
         int m = atoi(fields[offset+num_links+1+2*r+1].c_str());
-        Arc *arc = new Arc(h, m);
+		AD3::Arc *arc = new AD3::Arc(h, m);
         arcs[r] = arc;
       }
       factor = new FactorTree;

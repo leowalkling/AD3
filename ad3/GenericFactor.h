@@ -49,12 +49,12 @@ class GenericFactor : public Factor {
   /* Functions needed for gradient computation */
   void SetQPMaxIter(int it) { num_max_iterations_QP_ = it; }
   void SetClearCache(bool val) { clear_cache_ = val; }
-  vector<Configuration> GetQPActiveSet() const { return active_set_; }
-  vector<double> GetQPDistribution() const { return distribution_; }
-  vector<double> GetQPInvA() const { return inverse_A_; }
+  std::vector<Configuration> GetQPActiveSet() const { return active_set_; }
+  std::vector<double> GetQPDistribution() const { return distribution_; }
+  std::vector<double> GetQPInvA() const { return inverse_A_; }
 
   /* Get the correspondence between configurations & variable/additionals */
-  void GetCorrespondence(vector<double> *variable_m, vector<double> *additional_m);
+  void GetCorrespondence(std::vector<double> *variable_m, std::vector<double> *additional_m);
 
  protected:
   void ClearActiveSet();
@@ -64,10 +64,10 @@ class GenericFactor : public Factor {
   // a probability/weight for each configuration (stored in
   // vector distribution).
   void ComputeMarginalsFromSparseDistribution(
-    const vector<Configuration> &active_set,
-    const vector<double> &distribution,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) {
+    const std::vector<Configuration> &active_set,
+    const std::vector<double> &distribution,
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) {
     variable_posteriors->assign(binary_variables_.size(), 0.0);
     additional_posteriors->assign(additional_log_potentials_.size(), 0.0);
     for (int i = 0; i < active_set.size(); ++i) {
@@ -78,37 +78,37 @@ class GenericFactor : public Factor {
     }
   }
 
-  bool InvertAfterInsertion(const vector<Configuration> &active_set,
+  bool InvertAfterInsertion(const std::vector<Configuration> &active_set,
                             const Configuration &inserted_element);
 
-  void InvertAfterRemoval(const vector<Configuration> &active_set,
+  void InvertAfterRemoval(const std::vector<Configuration> &active_set,
                           int removed_index);
 
-  void ComputeActiveSetSimilarities(const vector<Configuration> &active_set,
-                                    vector<double> *similarities);
+  void ComputeActiveSetSimilarities(const std::vector<Configuration> &active_set,
+                                    std::vector<double> *similarities);
 
-  void EigenDecompose(vector<double> *similarities,
-                      vector<double> *eigenvalues);
+  void EigenDecompose(std::vector<double> *similarities,
+                      std::vector<double> *eigenvalues);
 
-  void Invert(const vector<double> &eigenvalues,
-              const vector<double> &eigenvectors);
+  void Invert(const std::vector<double> &eigenvalues,
+              const std::vector<double> &eigenvectors);
 
-  bool IsSingular(vector<double> &eigenvalues,
-                  vector<double> &eigenvectors,
-                  vector<double> *null_space_basis);
+  bool IsSingular(std::vector<double> &eigenvalues,
+                  std::vector<double> &eigenvectors,
+                  std::vector<double> *null_space_basis);
 
  public:
   // Compute the score of a given assignment.
   // This must be implemented in the user-defined factor.
-  virtual void Evaluate(const vector<double> &variable_log_potentials,
-                        const vector<double> &additional_log_potentials,
+  virtual void Evaluate(const std::vector<double> &variable_log_potentials,
+                        const std::vector<double> &additional_log_potentials,
                         const Configuration configuration,
                         double *value) = 0;
 
   // Find the most likely assignment.
   // This must be implemented in the user-defined factor.
-  virtual void Maximize(const vector<double> &variable_log_potentials,
-                        const vector<double> &additional_log_potentials,
+  virtual void Maximize(const std::vector<double> &variable_log_potentials,
+                        const std::vector<double> &additional_log_potentials,
                         Configuration &configuration,
                         double *value) = 0;
 
@@ -117,8 +117,8 @@ class GenericFactor : public Factor {
   virtual void UpdateMarginalsFromConfiguration(
     const Configuration &configuration,
     double weight,
-    vector<double> *variable_posteriors,
-    vector<double> *additional_posteriors) = 0;
+    std::vector<double> *variable_posteriors,
+    std::vector<double> *additional_posteriors) = 0;
 
   // Count how many common values two configurations have.
   virtual int CountCommonValues(
@@ -139,10 +139,10 @@ class GenericFactor : public Factor {
 
   // Compute the MAP (local subproblem in the projected subgradient algorithm).
   // The user-defined factor may override this.
-  virtual void SolveMAP(const vector<double> &variable_log_potentials,
-                        const vector<double> &additional_log_potentials,
-                        vector<double> *variable_posteriors,
-                        vector<double> *additional_posteriors,
+  virtual void SolveMAP(const std::vector<double> &variable_log_potentials,
+                        const std::vector<double> &additional_log_potentials,
+                        std::vector<double> *variable_posteriors,
+                        std::vector<double> *additional_posteriors,
                         double *value) {
     Configuration configuration = CreateConfiguration();
     Maximize(variable_log_potentials,
@@ -161,15 +161,15 @@ class GenericFactor : public Factor {
   // Solve the QP (local subproblem in the AD3 algorithm).
   // By default, used the active set method.
   // The user-defined factor may override this.
-  virtual void SolveQP(const vector<double> &variable_log_potentials,
-                       const vector<double> &additional_log_potentials,
-                       vector<double> *variable_posteriors,
-                       vector<double> *additional_posteriors);
+  virtual void SolveQP(const std::vector<double> &variable_log_potentials,
+                       const std::vector<double> &additional_log_potentials,
+                       std::vector<double> *variable_posteriors,
+                       std::vector<double> *additional_posteriors);
 
  protected:
-  vector<Configuration> active_set_;
-  vector<double> distribution_;
-  vector<double> inverse_A_;
+  std::vector<Configuration> active_set_;
+  std::vector<double> distribution_;
+  std::vector<double> inverse_A_;
   int num_max_iterations_QP_; // Initialize to 10.
   int verbosity_; // Verbosity level.
 
