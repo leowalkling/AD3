@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0023 NEW)
 
 project(AD3)
 
@@ -8,19 +9,28 @@ endif()
 
 include_directories(".")
 
+set(HEADER_FILES
+	examples/cpp/parsing/FactorTree.h
+	ad3/Factor.h
+	ad3/FactorDense.h
+	ad3/FactorGraph.h
+	ad3/GenericFactor.h
+	ad3/MultiVariable.h
+	ad3/Utils.h
+	examples/cpp/dense/FactorSequence.h
+	examples/cpp/parsing/FactorTree.h
+	examples/cpp/parsing/FactorGrandparentHeadAutomaton.h
+	examples/cpp/parsing/FactorHeadAutomaton.h
+	examples/cpp/parsing/FactorTree.h
+)
+
 add_library(ad3 STATIC
 		ad3/Factor.cpp
 		ad3/FactorGraph.cpp
 		ad3/GenericFactor.cpp
 		ad3/Utils.cpp
 		examples/cpp/parsing/FactorTree.cpp
-		# Headers
-		ad3/Factor.h
-		ad3/FactorDense.h
-		ad3/FactorGraph.h
-		ad3/GenericFactor.h
-		ad3/MultiVariable.h
-		ad3/Utils.h
+		${HEADER_FILES}
 )
 target_include_directories(ad3 PUBLIC Eigen)
 
@@ -42,17 +52,42 @@ target_include_directories(ad3_multi
 		examples/cpp/summarization
 )
 
+if (NOT SKBUILD)
+    add_executable(simple_grid examples/cpp/dense/simple_grid.cpp examples/cpp/dense/FactorSequence.h)
+    add_executable(simple_parser
+        examples/cpp/parsing/simple_parser
+        examples/cpp/parsing/FactorGrandparentHeadAutomaton.h
+        examples/cpp/parsing/FactorHeadAutomaton.h
+        examples/cpp/parsing/FactorTree.h
+    )
+    add_executable(simple_coref examples/cpp/logic/simple_coref.cpp)
+endif()
 
-add_executable(simple_grid examples/cpp/dense/simple_grid.cpp)
-add_executable(simple_parser examples/cpp/parsing/simple_parser)
-add_executable(simple_coref examples/cpp/logic/simple_coref.cpp)
-
-install(
-    TARGETS ad3 ad3_multi simple_grid simple_parser simple_coref
-    ARCHIVE DESTINATION lib
-	RUNTIME DESTINATION .
-	LIBRARY DESTINATION lib
-)
 install(TARGETS ad3
-        LIBRARY DESTINATION ad3
-		ARCHIVE DESTINATION ad3)
+        LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib)
+
+install(FILES ad3/Factor.h DESTINATION include/ad3)
+install(FILES ad3/FactorDense.h DESTINATION include/ad3)
+install(FILES ad3/FactorGraph.h DESTINATION include/ad3)
+install(FILES ad3/GenericFactor.h DESTINATION include/ad3)
+install(FILES ad3/MultiVariable.h DESTINATION include/ad3)
+install(FILES ad3/Utils.h DESTINATION include/ad3)
+install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+install(FILES examples/cpp/dense/FactorSequence.h DESTINATION include/ad3/examples/cpp/dense)
+install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+install(FILES examples/cpp/parsing/FactorGrandparentHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
+install(FILES examples/cpp/parsing/FactorHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
+install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+
+if(SKBUILD)
+    find_package(PythonInterp)
+    find_package(PythonLibs)
+    find_package(Cython REQUIRED)
+    find_package(NumPy REQUIRED)
+    find_package(PythonExtensions REQUIRED)
+
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    add_subdirectory(python)
+
+endif()

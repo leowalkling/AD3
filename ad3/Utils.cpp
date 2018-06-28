@@ -22,16 +22,16 @@
 
 //#include <iostream>
 
+using std::vector;
+using std::pair;
+using std::string;
+
 #if defined(_WIN32) && !defined(__MINGW32__)
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
   #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 #else
   #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
-
-using std::vector;
-using std::pair;
-using std::string;
 
 struct timezone 
 {

@@ -353,7 +353,10 @@ void GenericFactor::SolveQP(const vector<double> &variable_log_potentials,
     bool same_as_before = true;
     bool unbounded = false;
     if (changed_active_set) {
-      // Recompute vector b.
+	  // Recompute the active set
+		// TODO: But what?
+
+      // Recompute vector b (used in system Az = b)
       vector<double> b(active_set_.size() + 1, 0.0);
       b[0] = 1.0;
       for (int i = 0; i < active_set_.size(); ++i) {
