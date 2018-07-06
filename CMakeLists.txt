@@ -3,7 +3,7 @@ cmake_policy(SET CMP0023 NEW)
 
 project(AD3)
 
-if (UNIX)
+if(UNIX)
 	link_libraries(pthread)
 endif()
 
@@ -52,7 +52,7 @@ target_include_directories(ad3_multi
 		examples/cpp/summarization
 )
 
-if (NOT SKBUILD)
+if(NOT SKBUILD)
     add_executable(simple_grid examples/cpp/dense/simple_grid.cpp examples/cpp/dense/FactorSequence.h)
     add_executable(simple_parser
         examples/cpp/parsing/simple_parser
@@ -63,31 +63,51 @@ if (NOT SKBUILD)
     add_executable(simple_coref examples/cpp/logic/simple_coref.cpp)
 endif()
 
-install(TARGETS ad3
-        LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib)
+if(NOT SKBUILD)
+    install(TARGETS ad3
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+    install(FILES ad3/Factor.h DESTINATION include/ad3)
+    install(FILES ad3/FactorDense.h DESTINATION include/ad3)
+    install(FILES ad3/FactorGraph.h DESTINATION include/ad3)
+    install(FILES ad3/GenericFactor.h DESTINATION include/ad3)
+    install(FILES ad3/MultiVariable.h DESTINATION include/ad3)
+    install(FILES ad3/Utils.h DESTINATION include/ad3)
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+    install(FILES examples/cpp/dense/FactorSequence.h DESTINATION include/ad3/examples/cpp/dense)
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+    install(FILES examples/cpp/parsing/FactorGrandparentHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
+    install(FILES examples/cpp/parsing/FactorHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
+else()
+    if(WIN32)
+        set(CONDA_SUBDIR "Library/")
+    else()
+        set(CONDA_SUBDIR "")
+    endif()
+    install(TARGETS ad3
+            LIBRARY DESTINATION "${CONDA_SUBDIR}lib"
+            ARCHIVE DESTINATION "${CONDA_SUBDIR}lib")
+    install(FILES ad3/Factor.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES ad3/FactorDense.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES ad3/FactorGraph.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES ad3/GenericFactor.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES ad3/MultiVariable.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES ad3/Utils.h DESTINATION "${CONDA_SUBDIR}include/ad3")
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/parsing")
+    install(FILES examples/cpp/dense/FactorSequence.h DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/dense")
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/parsing")
+    install(FILES examples/cpp/parsing/FactorGrandparentHeadAutomaton.h
+            DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/parsing")
+    install(FILES examples/cpp/parsing/FactorHeadAutomaton.h
+            DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/parsing")
+    install(FILES examples/cpp/parsing/FactorTree.h DESTINATION "${CONDA_SUBDIR}include/ad3/examples/cpp/parsing")
 
-install(FILES ad3/Factor.h DESTINATION include/ad3)
-install(FILES ad3/FactorDense.h DESTINATION include/ad3)
-install(FILES ad3/FactorGraph.h DESTINATION include/ad3)
-install(FILES ad3/GenericFactor.h DESTINATION include/ad3)
-install(FILES ad3/MultiVariable.h DESTINATION include/ad3)
-install(FILES ad3/Utils.h DESTINATION include/ad3)
-install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
-install(FILES examples/cpp/dense/FactorSequence.h DESTINATION include/ad3/examples/cpp/dense)
-install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
-install(FILES examples/cpp/parsing/FactorGrandparentHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
-install(FILES examples/cpp/parsing/FactorHeadAutomaton.h DESTINATION include/ad3/examples/cpp/parsing)
-install(FILES examples/cpp/parsing/FactorTree.h DESTINATION include/ad3/examples/cpp/parsing)
-
-if(SKBUILD)
     find_package(PythonInterp)
     find_package(PythonLibs)
     find_package(Cython REQUIRED)
     find_package(NumPy REQUIRED)
     find_package(PythonExtensions REQUIRED)
 
-    include_directories(${PYTHON_INCLUDE_DIRS})
     add_subdirectory(python)
-
 endif()
