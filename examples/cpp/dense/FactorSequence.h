@@ -259,12 +259,12 @@ class FactorSequence : public GenericFactor {
   }
 
  protected:
-  // Number of states for each position.
+  /// Number of states for each position
   std::vector<int> num_states_;
-  // Offset of states for each position.
+  /// Start indices of the state elements for each position in the sequence
   std::vector<int> offset_states_;
-  // At each position, map from edges of states to a global index which
-  // matches the index of additional_log_potentials_.
+  // For each combination of (position, previous state, current state) contains the index
+  // of the corresponding potential
   std::vector<std::vector<std::vector<int> > > index_edges_;
 };
 
