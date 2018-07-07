@@ -6,11 +6,11 @@ from cpython cimport Py_INCREF
 from cython.view cimport array as cvarray
 from cython.view cimport array_cwrapper
 
-from base cimport Factor
-from base cimport BinaryVariable
-from base cimport MultiVariable
-from base cimport FactorGraph
-from base cimport PBinaryVariable, PMultiVariable, PFactor
+from .base cimport Factor
+from .base cimport BinaryVariable
+from .base cimport MultiVariable
+from .base cimport FactorGraph
+from .base cimport PBinaryVariable, PMultiVariable, PFactor
 
 
 cdef int _binary_vars_to_vector(

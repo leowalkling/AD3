@@ -1,5 +1,3 @@
-include MANIFEST.in
-recursive-include ad3 *.h *.cpp
-recursive-include examples *.h *.cpp
-recursive-include Eigen *
-recursive-include python/ad3 *.cpp *.h *.pyx *.pxd
+include python/README.md python/README
+recursive-include python/ad3 *.py *.pxd
+global-exclude __pycache__

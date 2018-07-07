@@ -4,7 +4,7 @@ from libcpp cimport bool
 
 # get the classes from the c++ headers
 
-cdef extern from "../ad3/Factor.h" namespace "AD3":
+cdef extern from "ad3/Factor.h" namespace "AD3":
     cdef cppclass BinaryVariable:
         BinaryVariable()
         double GetLogPotential()
@@ -30,7 +30,7 @@ cdef extern from "../ad3/Factor.h" namespace "AD3":
                      vector[double] *additional_posteriors)
 
 
-cdef extern from "../ad3/GenericFactor.h" namespace "AD3":
+cdef extern from "ad3/GenericFactor.h" namespace "AD3":
     ctypedef void *Configuration
 
     cdef cppclass GenericFactor:
@@ -42,7 +42,7 @@ cdef extern from "../ad3/GenericFactor.h" namespace "AD3":
         void SetClearCache(bool)
 
 
-cdef extern from "../ad3/MultiVariable.h" namespace "AD3":
+cdef extern from "ad3/MultiVariable.h" namespace "AD3":
     cdef cppclass MultiVariable:
         int GetNumStates()
         BinaryVariable *GetState(int i)
@@ -50,7 +50,7 @@ cdef extern from "../ad3/MultiVariable.h" namespace "AD3":
         void SetLogPotential(int i, double log_potential)
 
 
-cdef extern from "../ad3/FactorGraph.h" namespace "AD3":
+cdef extern from "ad3/FactorGraph.h" namespace "AD3":
     cdef cppclass FactorGraph:
         FactorGraph()
         void SetVerbosity(int verbosity)

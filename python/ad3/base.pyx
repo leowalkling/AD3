@@ -2,9 +2,9 @@ from libcpp.vector cimport vector
 from libcpp cimport bool
 
 cimport cython
-from base cimport Factor
-from base cimport BinaryVariable
-from base cimport MultiVariable
+from .base cimport Factor
+from .base cimport BinaryVariable
+from .base cimport MultiVariable
 
 
 cdef class PBinaryVariable:

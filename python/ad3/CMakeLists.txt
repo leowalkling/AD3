@@ -22,7 +22,5 @@ install(TARGETS base extensions factor_graph
         ARCHIVE DESTINATION python/ad3
         LIBRARY DESTINATION python/ad3)
 
-install(FILES base.pxd DESTINATION python/ad3)
-
 python_modules_header(modules
                       FORWARD_DECL_MODULES_LIST ${fdecl_module_list})

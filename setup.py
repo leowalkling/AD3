@@ -25,7 +25,8 @@ setup(name='ad3',
           'ad3': 'python/ad3',
           'ad3.tests': 'python/ad3/tests'
       },
-	  package_data={"ad3": ["*.lib", "*.a", "*.pxd"]},
+      package_data={"ad3": ["*.lib", "*.a", "*.pxd"]},
       packages=['ad3', 'ad3.tests'],
-      include_package_data=True
+      include_package_data=True,
+      zip_safe=False
 )

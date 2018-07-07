@@ -1,13 +1,11 @@
 from libcpp.vector cimport vector
 from libcpp cimport bool
 
-cimport cython
-
-from base cimport Factor
-from base cimport BinaryVariable
-from base cimport MultiVariable
-from base cimport FactorGraph
-from base cimport PBinaryVariable, PMultiVariable, PFactor, PGenericFactor
+from .base cimport Factor
+from .base cimport BinaryVariable
+from .base cimport MultiVariable
+from .base cimport FactorGraph
+from .base cimport PBinaryVariable, PMultiVariable, PFactor, PGenericFactor
 
 
 cdef extern from "../examples/cpp/dense/FactorSequence.h" namespace "AD3":
